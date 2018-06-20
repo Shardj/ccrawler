@@ -5,6 +5,7 @@ class CollectorItem:
     content: None
     parent: -1
     attempted: False
+    title: ''
 
     # Initializer
     def __init__(parentId,url):

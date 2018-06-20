@@ -8,13 +8,13 @@ parse['project']['path'] = os.path.abspath("./")
 with open(path, 'w') as configfile:
     parse.write(configfile)
 
-builtins.absolute = parse['project']['path'] # global variables for absolute path imports
+builtins.setAbsolute(parse['project']['path']) # global variables for absolute path imports
 builtins.projectRelativeImport = projectRelativeImport # new global function for importing using project relative path
 def projectRelativeImport(fileName, projectRelativePath, moduleName = None):
     if moduleName is None:
         moduleName = fileName.title()
 
-    module = imp.find_module(fileName, builtins.absolute + projectRelativePath)
+    module = imp.find_module(fileName, self.absolute + projectRelativePath)
     imp.load_module(moduleName, module)
 
 # Launch scraper/crawler

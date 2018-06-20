@@ -1,7 +1,9 @@
 # Imports
+import random
 from bs4 import BeautifulSoup
-projectRelativeImport('helpers','app/util/','Helper')
-projectRelativeImport('scrapedItem','./','ScrapedItem')
+projectRelativeImport('helpers', 'app/util/', 'Helper')
+projectRelativeImport('scrapedItem', 'app/modules/', 'ScrapedItem')
+projectRelativeImport('storageManager', 'app/modules/', 'StorageManager')
 
 # Main class to hold our data
 class Data:
@@ -53,6 +55,7 @@ class Data:
         # Alternative (more robust less efficient) condition `any(item.attempted == False for item in self.collector)`
         while (self.currentId+1 < self.collector.length):
             self.currentId++
+            time.sleep(5+random.randint(0, 5)) #don't want to get caught and ipbanned
             try:
                 currentItem = self.collector[self.currentId] # Does variable get set to loop scope or try scope? Testing will reveal
             except IndexError:
@@ -86,13 +89,17 @@ class Data:
 
                 self.addCollectorItem(createCollectorItem(url))
 
-            content = currentItemContent.find_all(self.selector)
-            currentItem.setContent(content)
+            currentItem.setContent(currentItemContent.find_all(self.selector))
+            currentItem.setTitle(currentItemContent.title.string)
+
             # Save changes
             self.collector[self.currentId] = currentItem
 
-        self.end()
+        self.save()
 
-    #We've crawled all possible urls and will now clean up. Consider making a hardsave function too to save while we crawl (memory is important guys)
-    def end:
-        #TODO
+    #We've crawled all possible urls and will now clean up. Consider implementing functionality to save while crawling (memory is important guys)
+    def save:
+        storage = StorageManager.DataStorage()
+        for index in range(len(self.collector)):
+            storage.saveItem(self.collector[index], index)
+            index+= 1
