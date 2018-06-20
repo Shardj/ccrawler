@@ -1,4 +1,4 @@
-import builtins, os
+import builtins, os, uuid
 
 class DataStorage:
     storagePath = builtins.getAbsolute()+'storage/'
@@ -12,10 +12,11 @@ class DataStorage:
         else:
             path = parentPath
 
-        title = item.getTitle()
-        childDir = path + title + '/'
-        metaPath = path + title + '.meta'
-        contentPath = path + title + '.html'
+        # naming for this item. title__h1__unique
+        name = item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
+        childDir = path + name + '/'
+        metaPath = path + name + '.meta'
+        contentPath = path + name + '.html'
         try:
             mkdir(childDir)
             write(metaPath, pprint(item))

@@ -91,6 +91,7 @@ class Data:
 
             currentItem.setContent(currentItemContent.find_all(self.selector))
             currentItem.setTitle(currentItemContent.title.string)
+            currentItem.setHeaderOne(currentItemContent.h1.string)
 
             # Save changes
             self.collector[self.currentId] = currentItem
