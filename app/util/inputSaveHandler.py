@@ -1,8 +1,10 @@
+import configparser
+
 class ConfHandler:
     confPath = r'.\settings\local.ini'
     conf = None
 
-    def __init__():
+    def __init__(self):
         self.conf = ConfigParser.ConfigParser()
         self.conf.read(self.confPath)
 

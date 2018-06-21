@@ -1,8 +1,7 @@
 # Imports
-from .modules.scrape import Scrape
-# from .util.InputSaveHandler import SaveHandler
-projectRelativeImport('InputSaveHandler','app/util/','SaveHandler')
-import ConfigParser, sys, builtins
+Scrape = projectRelativeImport('scrape', 'app/modules', 'Scrape')
+SaveHandler = projectRelativeImport('inputSaveHandler', 'app/util', 'SaveHandler')
+import sys, builtins
 
 # User input and startup, using previously entered values handler provides QOL, at the end we save values entered in current runtime as new default values
 handler = SaveHandler.ConfHandler()
@@ -14,7 +13,7 @@ handler.save()
 # Using imported Scrape file create an object from the Data class and call its start() method. Catch and log all errors collected and not handled from within scrape
 try:
     Scrape.Data(selector, starting, base).start()
-except as e:
+except Exception as e:
     print('Fatal error: ' + e)
     logError()
     sys.exit()

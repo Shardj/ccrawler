@@ -1,9 +1,9 @@
 # Imports
 import random
 from bs4 import BeautifulSoup
-projectRelativeImport('helpers', 'app/util/', 'Helper')
-projectRelativeImport('scrapedItem', 'app/modules/', 'ScrapedItem')
-projectRelativeImport('storageManager', 'app/modules/', 'StorageManager')
+Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
+ScrapedItem = projectRelativeImport('scrapedItem', 'app/modules', 'ScrapedItem')
+StorageManager = projectRelativeImport('storageManager', 'app/modules', 'StorageManager')
 
 # Main class to hold our data
 class Data:
@@ -17,8 +17,8 @@ class Data:
     selector = 'body'
     # request params
     PAYLOAD = {
-        timeout: 60,
-        headers: {
+        'timeout': 60,
+        'headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
         }
     }
@@ -50,11 +50,11 @@ class Data:
         return BeautifulSoup(response.content, 'html.parser')
 
     # Main Loop
-    def start:
+    def start():
         # Loop while there are still items left ahead of our current id in self.collector
         # Alternative (more robust less efficient) condition `any(item.attempted == False for item in self.collector)`
         while (self.currentId+1 < self.collector.length):
-            self.currentId++
+            self.currentId+=1
             time.sleep(5+random.randint(0, 5)) #don't want to get caught and ipbanned
             try:
                 currentItem = self.collector[self.currentId] # Does variable get set to loop scope or try scope? Testing will reveal
@@ -99,7 +99,7 @@ class Data:
         self.save()
 
     #We've crawled all possible urls and will now clean up. TODO implement functionality to save while crawling (memory is important guys)
-    def save:
+    def save():
         storage = StorageManager.DataStorage()
         # Save collector items where saved == False
         indexes = [idx for idx, val in enumerate(self.collector) if val.getSaved() == False]

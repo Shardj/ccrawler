@@ -1,7 +1,7 @@
 import builtins, os, uuid
 
 class DataStorage:
-    storagePath = builtins.getAbsolute()+'storage/'
+    storagePath = os.path.join(builtins.absolute, 'storage')
     map = [] # list of {id,childPath}
 
     def saveItem(item, itemId):
@@ -14,14 +14,14 @@ class DataStorage:
 
         # naming for this item. title__h1__unique
         name = item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
-        childDir = path + name + '/'
-        metaPath = path + name + '.meta'
-        contentPath = path + name + '.html'
+        childDir = os.path.join(path, name)
+        metaPath = os.path.join(path, name, '.meta')
+        contentPath = os.path.join(path, name, '.html')
         try:
             mkdir(childDir)
             write(metaPath, pprint(item))
             write(contentPath, item.getContent())
-        except(e):
+        except Exception as e:
             print('failed touch or mkdir')
             print(e)
             return
