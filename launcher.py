@@ -1,23 +1,21 @@
-import subprocess, pathlib, configparser, builtins, imp
+# Launcher defines our changes to builtins then runs app/main.py
+import subprocess, os, configparser, builtins, imp
 
 # Store project absolute path in global __builtins__
-projectDir = pathlib.Path(__file__).parent
+builtins.absolute = os.path.dirname(os.path.abspath(__file__)) # global variable for absolute path imports
 
-builtins.setAbsolute(projectDir) # global variable for absolute path imports
-builtins.projectRelativeImport = projectRelativeImport # new global function for importing using project relative path
 def projectRelativeImport(fileName, projectRelativePath, moduleName = None):
     if moduleName is None:
         moduleName = fileName.title()
 
-    module = imp.find_module(fileName, self.absolute + projectRelativePath)
+    path = builtins.absolute + projectRelativePath
+    if type(path) != 'list':
+        path = [path]
+
+    module = imp.find_module(fileName, path)
     imp.load_module(moduleName, module)
 
-# Launch scraper/crawler
-cmd = 'python ./app/main.py'
+builtins.projectRelativeImport = projectRelativeImport # new global function for importing using project relative path
 
-p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-out, err = p.communicate()
-result = out.split('\n')
-for lin in result:
-    if not lin.startswith('#'):
-        print(lin)
+# Launch scraper/crawler. Unecisarrily use our previously defined projectRelativeImport function for consistancy
+projectRelativeImport('main','/app')

@@ -98,9 +98,15 @@ class Data:
 
         self.save()
 
-    #We've crawled all possible urls and will now clean up. Consider implementing functionality to save while crawling (memory is important guys)
+    #We've crawled all possible urls and will now clean up. TODO implement functionality to save while crawling (memory is important guys)
     def save:
         storage = StorageManager.DataStorage()
-        for index in range(len(self.collector)):
-            storage.saveItem(self.collector[index], index)
+        # Save collector items where saved == False
+        indexes = [idx for idx, val in enumerate(self.collector) if val.getSaved() == False]
+        for index in indexes:
+            if storage.saveItem(self.collector[index], index):
+                self.collector[index].setSaved(True)
+            else:
+                self.collector[index].setSaved(False)
+
             index+= 1

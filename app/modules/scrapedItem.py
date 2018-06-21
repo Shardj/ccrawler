@@ -7,6 +7,7 @@ class CollectorItem:
     attempted: False
     title: ''
     headerOne: ''
+    saved: False
 
     # Initializer
     def __init__(parentId,url):

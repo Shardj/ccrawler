@@ -27,6 +27,7 @@ class DataStorage:
             return
 
         self.map.append({id: itemId, childPath: childDir})
+        return True
 
     def getChildPath(id):
         if any(item.id == id for item in self.map):
