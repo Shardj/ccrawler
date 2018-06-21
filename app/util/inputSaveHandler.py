@@ -5,7 +5,7 @@ class ConfHandler:
     conf = None
 
     def __init__(self):
-        self.conf = ConfigParser.ConfigParser()
+        self.conf = configparser.ConfigParser()
         self.conf.read(self.confPath)
 
     def save():
