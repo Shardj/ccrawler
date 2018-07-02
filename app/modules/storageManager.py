@@ -4,8 +4,8 @@ class DataStorage:
     storagePath = os.path.join(builtins.absolute, 'storage')
     map = [] # list of {id,childPath}
 
-    def saveItem(item, itemId):
-        parentPath = getChildPath(item.getParentId())
+    def saveItem(self, item, itemId):
+        parentPath = self.getChildPath(item.getParentId())
 
         if parentPath == False:
             path = storagePath
@@ -29,7 +29,7 @@ class DataStorage:
         self.map.append({id: itemId, childPath: childDir})
         return True
 
-    def getChildPath(id):
+    def getChildPath(self, id):
         if any(item.id == id for item in self.map):
             item = self.getMapItem(id)
             if item == False:
@@ -37,16 +37,16 @@ class DataStorage:
 
             return item.childPath
 
-    def write(fullpath,content):
+    def write(self, fullpath,content):
         file = open(fullpath, 'w')
         file.write(content)
         file.close()
 
-    def mkdir(directory):
+    def mkdir(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    def getMapItem(id):
+    def getMapItem(self, id):
         for item in self.map:
             if item.id == id:
                 return item
