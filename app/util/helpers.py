@@ -17,3 +17,6 @@ def url_validate(url):
 # rindex for lists (reverse index)
 def rindex(mylist, myvalue):
     return len(mylist) - mylist[::-1].index(myvalue) - 1
+
+def removeNonAlphaNumeric(text):
+    return re.sub(r'\W+', '', text)

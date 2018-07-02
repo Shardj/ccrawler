@@ -1,11 +1,14 @@
-import builtins, os, uuid, json
+import builtins, os, uuid, json, time
+Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
 
 class DataStorage:
-    storagePath = os.path.join(builtins.absolute, 'storage')
+
+    def __init__(self, base):
+        # absolute path to project, storage directory, base_url + _time
+        self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + time.time())
+        mkdir(self.storagePath)
 
     def saveItem(self, item, itemId):
-        parentPath = self.getChildPath(item.getParentId())
-
         # naming for this item. title__h1__unique
         name = item.getId() + '__' + item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
         metaPath = os.path.join(self.storagePath, name, '.meta')

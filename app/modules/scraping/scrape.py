@@ -48,8 +48,15 @@ class Data:
 
     # Returns content from url wrapped in BeautifulSoup object
     def fetchUrl(self, url):
+        t0 = time.time() # attempted request time
         response = requests.get(url, params=self.PAYLOAD)
+        self.responseDelay = time.time() - t0; # record response delay
         return BeautifulSoup(response.content, 'html.parser')
+
+    def sleeper(self):
+        sec = 0.01+(10*self.responseDelay) # backoff if responseDelay is high
+        print('Finished with currentItem ' + str(self.currentId) + '. Will now sleep for ' + str(sec) + ' seconds')
+        time.sleep(sec) #don't want to get caught and ipbanned or other shiz. Lets take it steady
 
     # Main Loop
     def start(self):
@@ -90,19 +97,19 @@ class Data:
                     continue
 
                 # Check we haven't already stored this url
-                item = None
+                item = None # we want scope of item to be here. Value changes in if else. Value is used in if not after that
                 selfReferencing = True
                 if any(item.url == url for item in self.collector):
                     # we have already stored this url so now find the item using it and add current as parent
                     for item in self.collector:
                         if item.url == url and item.id != self.currentId:
                             selfReferencing = False
-                            self.collector[item.id].parents.append(currentId)
-                            break #break out of loop so item keeps its value to be used outside this if else
+                            self.collector[item.id].parents.append(self.currentId) # adds current id to parents on already existing item
+                            break # break out of loop so item keeps its value to be used outside this if else
 
                 else:
                     # we haven't already stored this url so we must create an item for it
-                    item = self.createCollectorItem(url)
+                    item = self.createCollectorItem(url) # creating collector item  handles parentId
                     self.addCollectorItem(item)
 
                 if not selfReferencing:
@@ -116,15 +123,16 @@ class Data:
 
             # Save changes
             self.collector[self.currentId] = currentItem
+            self.sleeper() # wait before making another request
 
-            sec = 5+random.randint(0, 5)
-            print('Finished with currentItem ' + str(self.currentId) + '. Will now sleep for ' + str(sec) + ' seconds')
-            time.sleep(sec) #don't want to get caught and ipbanned
         self.save()
 
-    #We've crawled all possible urls and will now clean up. TODO implement functionality to save while crawling (memory is important guys)
+    # We've crawled all possible urls and will now clean up.
+    # TODO implement functionality to save while crawling (memory is important guys).
+    # TODO cont... Maybe create a temp save handler which basicaly act as variables but in storage, should only hold content as the rest is required.
+    # TODO cont... Better solution would likely be to use a database to hold what is currently self.collector[].
     def save(self):
-        storage = StorageManager.DataStorage()
+        storage = StorageManager.DataStorage(self.base)
         # Save collector items where saved == False
         indexes = [idx for idx, val in enumerate(self.collector) if val.saved == False]
         for index in indexes:
