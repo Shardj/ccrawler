@@ -1,41 +1,27 @@
-import builtins, os, uuid
+import builtins, os, uuid, json
 
 class DataStorage:
     storagePath = os.path.join(builtins.absolute, 'storage')
-    map = [] # list of {id,childPath}
+
+    def __init__(self):
+        self.map = [] # list of {id,childPath}
 
     def saveItem(self, item, itemId):
         parentPath = self.getChildPath(item.getParentId())
 
-        if parentPath == False:
-            path = storagePath
-        else:
-            path = parentPath
-
         # naming for this item. title__h1__unique
-        name = item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
-        childDir = os.path.join(path, name)
-        metaPath = os.path.join(path, name, '.meta')
-        contentPath = os.path.join(path, name, '.html')
+        name = item.getId() + '__' + item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
+        metaPath = os.path.join(self.storagePath, name, '.meta')
+        contentPath = os.path.join(self.storagePath, name, '.html')
         try:
-            mkdir(childDir)
-            write(metaPath, pprint(item))
+            write(metaPath, json.dumps(item))
             write(contentPath, item.getContent())
         except Exception as e:
-            print('failed touch or mkdir')
+            print('failed to write files')
             print(e)
             return
 
-        self.map.append({id: itemId, childPath: childDir})
         return True
-
-    def getChildPath(self, id):
-        if any(item.id == id for item in self.map):
-            item = self.getMapItem(id)
-            if item == False:
-                return False
-
-            return item.childPath
 
     def write(self, fullpath,content):
         file = open(fullpath, 'w')

@@ -1,7 +1,8 @@
 import re
 
+# I think you can guess what this does
 def url_validate(url):
-    if url is None:
+    if url is None or url is '':
         return False
 
     regex = re.compile(
@@ -11,8 +12,8 @@ def url_validate(url):
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
             r'(?::\d+)?' # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    result = re.match(regex, url) # True if match, None if no match
-    if result:
-        return True
+    return bool(re.match(regex, url))
 
-    return False
+# rindex for lists (reverse index)
+def rindex(mylist, myvalue):
+    return len(mylist) - mylist[::-1].index(myvalue) - 1

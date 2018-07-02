@@ -33,7 +33,9 @@ class Data:
         self.base = baseUrl
         # Holds result
         self.collector = []
-        self.addCollectorItem(self.createCollectorItem(starter))
+        item = self.createCollectorItem(starter)
+        item.id = Helper.rindex(self.collector, item)
+        self.addCollectorItem(item)
 
     # Creates a brand new unedited collector item and returns it
     def createCollectorItem(self, url):
@@ -91,7 +93,10 @@ class Data:
                 if any(item.url == url for item in self.collector):
                     continue
 
-                self.addCollectorItem(createCollectorItem(url))
+                item = createCollectorItem(url)
+                item.id = Helper.rindex(self.collector, item)
+                self.addCollectorItem(item)
+                currentItem.children.append(item.id)
 
             currentItem.content = currentItemContent.find_all(self.selector)
             currentItem.title = currentItemContent.title.string

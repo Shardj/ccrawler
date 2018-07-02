@@ -17,5 +17,8 @@ class TestHelperMethods(unittest.TestCase):
         self.assertEqual(self.Helper.url_validate('ftp://domain.com/path'), True)
         self.assertEqual(self.Helper.url_validate('http://domain.com/path/file.html'), True)
 
+    def test_rindex(self):
+        self.assertEqual(self.Helper.rindex(['a','b','c','d'],'b'), 1)
+
 if __name__=='__main__':
     unittest.main()

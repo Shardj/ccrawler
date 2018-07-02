@@ -15,5 +15,6 @@ class CollectorItem:
         self.title = ''
         self.headerOne = ''
         self.saved = False
-        self.parent = parentId
+        self.parents = [parentId]
+        self.children = []
         self.url = url
