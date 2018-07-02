@@ -11,4 +11,8 @@ def url_validate(url):
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
             r'(?::\d+)?' # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    return re.match(regex, url)
+    result = re.match(regex, url) # True if match, None if no match
+    if result:
+        return True
+
+    return False
