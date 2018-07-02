@@ -3,8 +3,8 @@ import random, time, requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
-ScrapedItem = projectRelativeImport('scrapedItem', 'app/modules', 'ScrapedItem')
-StorageManager = projectRelativeImport('storageManager', 'app/modules', 'StorageManager')
+ScrapedItem = projectRelativeImport('scrapedItem', 'app/modules/scraping', 'ScrapedItem')
+StorageManager = projectRelativeImport('storageManager', 'app/modules/file-management', 'StorageManager')
 
 # Main class to hold our data
 class Data:
@@ -34,7 +34,6 @@ class Data:
         # Holds result
         self.collector = []
         item = self.createCollectorItem(starter)
-        item.id = Helper.rindex(self.collector, item)
         self.addCollectorItem(item)
 
     # Creates a brand new unedited collector item and returns it
@@ -44,6 +43,7 @@ class Data:
 
     # Adds supplied item to the end of our collector
     def addCollectorItem(self, item):
+        item.id = len(self.collector) # next value in collector will be the index, which we will call id on the object
         self.collector.append(item)
 
     # Returns content from url wrapped in BeautifulSoup object
@@ -90,13 +90,25 @@ class Data:
                     continue
 
                 # Check we haven't already stored this url
+                item = None
+                selfReferencing = True
                 if any(item.url == url for item in self.collector):
-                    continue
+                    # we have already stored this url so now find the item using it and add current as parent
+                    for item in self.collector:
+                        if item.url == url and item.id != self.currentId:
+                            selfReferencing = False
+                            self.collector[item.id].parents.append(currentId)
+                            break #break out of loop so item keeps its value to be used outside this if else
 
-                item = createCollectorItem(url)
-                item.id = Helper.rindex(self.collector, item)
-                self.addCollectorItem(item)
-                currentItem.children.append(item.id)
+                else:
+                    # we haven't already stored this url so we must create an item for it
+                    item = self.createCollectorItem(url)
+                    self.addCollectorItem(item)
+
+                if not selfReferencing:
+                    # whether we have or havent stored this url before we must still add the child to currrent items child ids
+                    # with the exception of when a page is linking to itself, aka don't add child if self referencing
+                    currentItem.children.append(item.id)
 
             currentItem.content = currentItemContent.find_all(self.selector)
             currentItem.title = currentItemContent.title.string

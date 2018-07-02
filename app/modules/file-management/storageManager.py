@@ -3,9 +3,6 @@ import builtins, os, uuid, json
 class DataStorage:
     storagePath = os.path.join(builtins.absolute, 'storage')
 
-    def __init__(self):
-        self.map = [] # list of {id,childPath}
-
     def saveItem(self, item, itemId):
         parentPath = self.getChildPath(item.getParentId())
 
@@ -31,10 +28,3 @@ class DataStorage:
     def mkdir(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
-
-    def getMapItem(self, id):
-        for item in self.map:
-            if item.id == id:
-                return item
-            else:
-                return False

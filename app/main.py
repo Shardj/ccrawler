@@ -1,5 +1,5 @@
 # Imports
-Scrape = projectRelativeImport('scrape', 'app/modules', 'Scrape')
+Scrape = projectRelativeImport('scrape', 'app/modules/scraping', 'Scrape')
 SaveHandler = projectRelativeImport('inputSaveHandler', 'app/util', 'SaveHandler')
 import sys, builtins
 
