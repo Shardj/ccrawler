@@ -18,3 +18,10 @@ class CollectorItem:
         self.parents = [parentId]
         self.children = []
         self.url = url
+        self.id = None
+
+    def stringifyTags(self):
+        self.content = str(self.content)
+        self.title = str(self.title)
+        self.headerOne = str(self.headerOne)
+        return self

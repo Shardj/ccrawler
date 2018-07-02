@@ -5,17 +5,17 @@ class DataStorage:
 
     def __init__(self, base):
         # absolute path to project, storage directory, base_url + _time
-        self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + time.time())
-        mkdir(self.storagePath)
+        self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + str(time.time()))
+        self.mkdir(self.storagePath)
 
-    def saveItem(self, item, itemId):
+    def saveItem(self, item):
         # naming for this item. title__h1__unique
-        name = item.getId() + '__' + item.getTitle() + '__' + item.getHeaderOne() + '__' + uuid.uuid4().hex[:6].upper()
-        metaPath = os.path.join(self.storagePath, name, '.meta')
-        contentPath = os.path.join(self.storagePath, name, '.html')
+        name = str(item.id) + '__' + item.title + '__' + item.headerOne + '__' + uuid.uuid4().hex[:6].upper()
+        metaPath = os.path.join(self.storagePath, name + '.meta')
+        contentPath = os.path.join(self.storagePath, name + '.html')
         try:
-            write(metaPath, json.dumps(item))
-            write(contentPath, item.getContent())
+            self.write(metaPath, json.dumps(item.stringifyTags().__dict__))
+            self.write(contentPath, item.getContent())
         except Exception as e:
             print('failed to write files')
             print(e)

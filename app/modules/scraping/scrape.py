@@ -136,7 +136,7 @@ class Data:
         # Save collector items where saved == False
         indexes = [idx for idx, val in enumerate(self.collector) if val.saved == False]
         for index in indexes:
-            if storage.saveItem(self.collector[index], index):
+            if storage.saveItem(self.collector[index]):
                 self.collector[index].saved = True
             else:
                 self.collector[index].saved = False
