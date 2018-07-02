@@ -15,7 +15,7 @@ class DataStorage:
         contentPath = os.path.join(self.storagePath, name + '.html')
         try:
             self.write(metaPath, json.dumps(item.stringifyTags().__dict__))
-            self.write(contentPath, item.getContent())
+            self.write(contentPath, item.content)
         except Exception as e:
             print('failed to write files')
             print(e)
@@ -23,7 +23,7 @@ class DataStorage:
 
         return True
 
-    def write(self, fullpath,content):
+    def write(self, fullpath, content):
         file = open(fullpath, 'w')
         file.write(content)
         file.close()

@@ -1,5 +1,6 @@
 # Imports
 import random, time, requests
+from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
@@ -14,16 +15,12 @@ class Data:
     base = ''
     # the selector for getting the element which holds the content we want to save
     selector = 'body'
-    # request params
-    PAYLOAD = {
-        'timeout': 60,
-        'headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
-        }
-    }
 
     # Initializer, adds our first collector item to our collector and sets the base url
     def __init__(self, selector, starter, baseUrl = ''):
+        self.setPayload()
+
+        # validate
         if baseUrl == '' or baseUrl is None:
             baseUrl = starter
 
@@ -35,6 +32,25 @@ class Data:
         self.collector = []
         item = self.createCollectorItem(starter)
         self.addCollectorItem(item)
+
+    def setPayload():
+        print('requesting random agent from w3schools')
+        agent = None
+        try:
+            agent = UserAgent().random
+        except:
+            print('request failed, using default agent')
+            agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
+
+        print('agent: ' + agent)
+
+        # request params
+        self.PAYLOAD = {
+            'timeout': 60,
+            'headers': {
+                'User-Agent': agent
+            }
+        }
 
     # Creates a brand new unedited collector item and returns it
     def createCollectorItem(self, url):
@@ -56,7 +72,24 @@ class Data:
     def sleeper(self):
         sec = 0.01+(10*self.responseDelay) # backoff if responseDelay is high
         print('Finished with currentItem ' + str(self.currentId) + '. Will now sleep for ' + str(sec) + ' seconds')
-        time.sleep(sec) #don't want to get caught and ipbanned or other shiz. Lets take it steady
+        time.sleep(sec) # don't want to get caught and ipbanned or other shiz. Lets take it steady
+        self.setPayload() # new agent
+
+    def contentExtract(self, currentItem, currentItemContent):
+        currentItem.content = currentItemContent.find_all(self.selector)
+        currentItem.title = currentItemContent.title
+        if currentItem.title != None:
+            currentItem.title = currentItem.title.string
+        else:
+            currentItem.title = ''
+
+        currentItem.headerOne = currentItemContent.h1
+        if currentItem.headerOne != None:
+            currentItem.headerOne = currentItem.headerOne.string
+        else:
+            currentItem.headerOne = ''
+
+        return currentItem
 
     # Main Loop
     def start(self):
@@ -117,9 +150,7 @@ class Data:
                     # with the exception of when a page is linking to itself, aka don't add child if self referencing
                     currentItem.children.append(item.id)
 
-            currentItem.content = currentItemContent.find_all(self.selector)
-            currentItem.title = currentItemContent.title.string
-            currentItem.setHeaderOne = currentItemContent.h1.string
+            currentItem = self.contentExtract(currentItem, currentItemContent) # sets currentItem's content, headerOne and title
 
             # Save changes
             self.collector[self.currentId] = currentItem
