@@ -1,4 +1,5 @@
 import copy
+Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
 
 # Individual items being held in scrape.py Data collector
 class CollectorItem:
@@ -30,6 +31,6 @@ class CollectorItem:
             temp = temp + str(contentPart)
 
         clone.content = temp
-        clone.title = str(clone.title)
-        clone.headerOne = str(clone.headerOne)
+        clone.title = Helper.xstr(clone.title)
+        clone.headerOne = Helper.xstr(clone.headerOne)
         return clone

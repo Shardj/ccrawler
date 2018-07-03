@@ -20,3 +20,8 @@ def rindex(mylist, myvalue):
 
 def removeNonAlphaNumeric(text):
     return re.sub(r'\W+', '', text)
+
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
