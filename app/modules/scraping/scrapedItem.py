@@ -1,3 +1,5 @@
+import copy
+
 # Individual items being held in scrape.py Data collector
 class CollectorItem:
     # Initializer
@@ -10,7 +12,7 @@ class CollectorItem:
             raise ValueError('invalid value of parentId in CollectorItem __init__(), must be greater than or equal to negative one')
 
         # Values
-        self.content = None
+        self.content = [] # array normally with only one value, but selector could return multiple values
         self.attempted = False
         self.title = ''
         self.headerOne = ''
@@ -20,8 +22,14 @@ class CollectorItem:
         self.url = url
         self.id = None
 
+    # returns a stringified clone, doesn't effect original
     def stringifyTags(self):
-        self.content = str(self.content)
-        self.title = str(self.title)
-        self.headerOne = str(self.headerOne)
-        return self
+        clone = copy.copy(self)
+        temp = ""
+        for contentPart in clone.content:
+            temp = temp + str(contentPart)
+
+        clone.content = temp
+        clone.title = str(clone.title)
+        clone.headerOne = str(clone.headerOne)
+        return clone

@@ -2,7 +2,7 @@
 import random, time, requests
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urldefrag
 Helper = projectRelativeImport('helpers', 'app/util', 'Helper')
 ScrapedItem = projectRelativeImport('scrapedItem', 'app/modules/scraping', 'ScrapedItem')
 StorageManager = projectRelativeImport('storageManager', 'app/modules/file-management', 'StorageManager')
@@ -33,7 +33,7 @@ class Data:
         item = self.createCollectorItem(starter)
         self.addCollectorItem(item)
 
-    def setPayload():
+    def setPayload(self):
         print('requesting random agent from w3schools')
         agent = None
         try:
@@ -45,7 +45,7 @@ class Data:
         print('agent: ' + agent)
 
         # request params
-        self.PAYLOAD = {
+        self.payload = {
             'timeout': 60,
             'headers': {
                 'User-Agent': agent
@@ -65,12 +65,12 @@ class Data:
     # Returns content from url wrapped in BeautifulSoup object
     def fetchUrl(self, url):
         t0 = time.time() # attempted request time
-        response = requests.get(url, params=self.PAYLOAD)
+        response = requests.get(url, params=self.payload)
         self.responseDelay = time.time() - t0; # record response delay
         return BeautifulSoup(response.content, 'html.parser')
 
     def sleeper(self):
-        sec = 0.01+(10*self.responseDelay) # backoff if responseDelay is high
+        sec = round(0.01+(10*self.responseDelay),2) # backoff if responseDelay is high
         print('Finished with currentItem ' + str(self.currentId) + '. Will now sleep for ' + str(sec) + ' seconds')
         time.sleep(sec) # don't want to get caught and ipbanned or other shiz. Lets take it steady
         self.setPayload() # new agent
@@ -124,6 +124,8 @@ class Data:
                     if Helper.url_validate(url) == False:
                         continue
 
+                # TODO check for redirects here
+                url = urldefrag(url).url # remove fragmentation from url before checks
 
                 # Check url is an extension of our base url
                 if self.base not in url:
@@ -163,6 +165,7 @@ class Data:
     # TODO cont... Maybe create a temp save handler which basicaly act as variables but in storage, should only hold content as the rest is required.
     # TODO cont... Better solution would likely be to use a database to hold what is currently self.collector[].
     def save(self):
+        print('Attempting to save')
         storage = StorageManager.DataStorage(self.base)
         # Save collector items where saved == False
         indexes = [idx for idx, val in enumerate(self.collector) if val.saved == False]
@@ -173,3 +176,5 @@ class Data:
                 self.collector[index].saved = False
 
             index+= 1
+
+        print('Saved')

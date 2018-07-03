@@ -14,8 +14,11 @@ class DataStorage:
         metaPath = os.path.join(self.storagePath, name + '.meta')
         contentPath = os.path.join(self.storagePath, name + '.html')
         try:
-            self.write(metaPath, json.dumps(item.stringifyTags().__dict__))
-            self.write(contentPath, item.content)
+            clonedItem = item.stringifyTags()
+            self.write(contentPath, clonedItem.content)
+            del clonedItem.content # we don't want content in our meta files
+            self.write(metaPath, json.dumps(clonedItem.__dict__))
+            # our cloned item loses scope here and is thrown away
         except Exception as e:
             print('failed to write files')
             print(e)
