@@ -69,7 +69,14 @@ class Data:
         response = requests.get(currentItem.url, params=self.payload)
         if response.history == 302:
             currentItem.url = response.headers['Location'] # redirect url
-            urlChecks(currentItem.url, currentItem)
+            checkResult = urlChecks(currentItem.url, currentItem)
+            if checkResult == False:
+                return False # returned false so url is invalid and we must skip it
+
+            if not isinstance(ScrapedItem.CollectorItem, checkResult):
+                raise ValueError('urlChecks should have returned False from failing or returned a valid instance oc CollectorItem')
+
+            self.collector[self.currentId] = checkResult # urlChecks didn't return false so it must be valid, instead urlChecks must have returned new currentItem
 
         self.responseDelay = time.time() - t0; # record response delay
         return BeautifulSoup(response.content, 'html.parser')
@@ -161,8 +168,12 @@ class Data:
             # Attempt to fetch content from url
             try:
                 currentItemContent = self.fetchUrl(currentItem)
-                currentItem.attempted = True
-                self.collector[self.currentId] = currentItem # Save changes
+                if currentItemContent == False: # url redirected and the redirect was invalid
+                    del self.collector[self.currentId]
+                    continue # skip to next item in self.collector
+                else:
+                    currentItem.attempted = True
+                    self.collector[self.currentId] = currentItem # Save changes
             except:
                 # if fetching raises an exception we still want to mark as attempted
                 currentItem.attempted = True
@@ -175,7 +186,7 @@ class Data:
                 if checkResult == False:
                     continue # returned false so url is invalid and we must skip it
                 if not isinstance(ScrapedItem.CollectorItem, checkResult):
-                    raise ValueError('urlChecks should have returned False from failing or returned a valid instance oc CollectorItem')
+                    raise ValueError('urlChecks should have returned False from failing or returned a valid instance of CollectorItem')
                 currentItem = checkResult # urlChecks didn't return false so it must be valid, instead urlChecks must have returned new currentItem
 
             currentItem = self.contentExtract(currentItem, currentItemContent) # sets currentItem's content, headerOne and title
