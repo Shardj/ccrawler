@@ -6,13 +6,14 @@ class DataStorage:
     def __init__(self, base):
         # absolute path to project, storage directory, base_url + _time
         self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + str(round(time.time(),0)) )
+        self.storagePath = Helper.purgeWhitespace(self.storagePath)
         self.mkdir(self.storagePath)
 
     def saveItem(self, item):
         try:
             clonedItem = item.stringifyTags()
             # naming for this item. title__h1__unique
-            name = str(clonedItem.id) + '__' + clonedItem.title + '__' + clonedItem.headerOne
+            name = purgeWhitespace( str(clonedItem.id) + '__' + clonedItem.title + '__' + clonedItem.headerOne )
             metaPath = os.path.join(self.storagePath, name + '.meta')
             contentPath = os.path.join(self.storagePath, name + '.html')
             self.write(contentPath, clonedItem.content)

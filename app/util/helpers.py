@@ -25,3 +25,6 @@ def xstr(s):
     if s is None:
         return ''
     return str(s)
+
+def purgeWhitespace(text):
+    return re.sub('\s', '', text) # remove all whitespace
