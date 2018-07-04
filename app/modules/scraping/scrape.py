@@ -144,7 +144,7 @@ class Data:
             # whether we have or havent stored this url before we must still add the child to currrent items child ids
             # with the exception of when a page is linking to itself, aka don't add child if self referencing
             # and also with the exception of if we already have the id listed as a child
-            currentItem.children.append(item.id)
+            currentItem.children.append(foundItem.id)
 
         return currentItem;
 
