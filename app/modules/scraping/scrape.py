@@ -185,7 +185,7 @@ class Data:
                 checkResult = self.urlChecks(link.get('href'), currentItem)
                 if checkResult == False:
                     continue # returned false so url is invalid and we must skip it
-                if not isinstance(ScrapedItem.CollectorItem, checkResult):
+                if not isinstance(checkResult, ScrapedItem.CollectorItem):
                     raise ValueError('urlChecks should have returned False from failing or returned a valid instance of CollectorItem')
                 currentItem = checkResult # urlChecks didn't return false so it must be valid, instead urlChecks must have returned new currentItem
 
