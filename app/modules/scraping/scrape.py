@@ -46,6 +46,7 @@ class Data:
 
         # request params
         self.payload = {
+            'allow_redirects': False,
             'timeout': 60,
             'headers': {
                 'User-Agent': agent
@@ -63,9 +64,13 @@ class Data:
         self.collector.append(item)
 
     # Returns content from url wrapped in BeautifulSoup object
-    def fetchUrl(self, url):
+    def fetchUrl(self, currentItem):
         t0 = time.time() # attempted request time
-        response = requests.get(url, params=self.payload)
+        response = requests.get(currentItem.url, params=self.payload)
+        if response.status_code == 302:
+            currentItem.url = response.headers['Location'] # redirect url
+            urlChecks(currentItem.url, currentItem)
+
         self.responseDelay = time.time() - t0; # record response delay
         return BeautifulSoup(response.content, 'html.parser')
 
@@ -91,6 +96,51 @@ class Data:
 
         return currentItem
 
+    def urlChecks(self, url, currentItem):
+        # Validate url
+        if Helper.url_validate(url) == False:
+            url = urljoin(currentItem.url, url) #to handle relative path urls
+            if Helper.url_validate(url) == False:
+                return False
+
+        url = urldefrag(url).url # remove fragmentation from url before checks
+
+        # Check url is an extension of our base url
+        if self.base not in url:
+            return False
+
+        # if self referencing link then just pass back without issue and without changes
+        if url == currentItem.url:
+            return currentItem
+
+        # Check we haven't already stored this url
+        foundItem = None # we want scope of item to be here. Value changes in if else. Value is used in if not after that
+        if any(item.url == url for item in self.collector):
+            # we have already stored this url so now find the item using it and add current as parent
+            for item in self.collector:
+                if item.url == url: # found correct item
+                    if self.currentId not in self.collector[item.id].parents: # if not already parent adds current id to parents on already existing item
+                        self.collector[item.id].parents.append(self.currentId)
+
+                    foundItem = item
+                    break # break out of loop so item keeps its value in foundItem to be used later
+
+        else:
+            # we haven't already stored this url so we must create an item for it
+            foundItem = self.createCollectorItem(url) # creating collector item  handles parentId
+            self.addCollectorItem(item)
+
+        if foundItem is None:
+            raise valueError('foundItem should never be without value here')
+
+        if foundItem.id not in currentItem.children:
+            # whether we have or havent stored this url before we must still add the child to currrent items child ids
+            # with the exception of when a page is linking to itself, aka don't add child if self referencing
+            # and also with the exception of if we already have the id listed as a child
+            currentItem.children.append(item.id)
+
+        return currentItem;
+
     # Main Loop
     def start(self):
         # Loop while there are still items left ahead of our current id in self.collector
@@ -110,7 +160,7 @@ class Data:
 
             # Attempt to fetch content from url
             try:
-                currentItemContent = self.fetchUrl(currentItem.url)
+                currentItemContent = self.fetchUrl(currentItem)
                 currentItem.attempted = True
                 self.collector[self.currentId] = currentItem # Save changes
             except:
@@ -121,44 +171,12 @@ class Data:
 
             # Create new items from found links
             for link in currentItemContent.find_all('a'):
-                url = link.get('href')
-
-                # Validate url
-                if Helper.url_validate(url) == False:
-                    url = urljoin(currentItem.url, url) #to handle relative path urls
-                    if Helper.url_validate(url) == False:
-                        continue
-
-                # TODO check for redirects here
-                url = urldefrag(url).url # remove fragmentation from url before checks
-
-                # Check url is an extension of our base url
-                if self.base not in url:
-                    continue
-
-                # Check we haven't already stored this url
-                item = None # we want scope of item to be here. Value changes in if else. Value is used in if not after that
-                selfReferencing = True
-                if any(item.url == url for item in self.collector):
-                    # we have already stored this url so now find the item using it and add current as parent
-                    for item in self.collector:
-                        if item.url == url and item.id != self.currentId:
-                            selfReferencing = False
-                            if self.currentId not in self.collector[item.id].parents: # if not already parent adds current id to parents on already existing item
-                                self.collector[item.id].parents.append(self.currentId)
-
-                            break # break out of loop so item keeps its value to be used outside this if else
-
-                else:
-                    # we haven't already stored this url so we must create an item for it
-                    item = self.createCollectorItem(url) # creating collector item  handles parentId
-                    self.addCollectorItem(item)
-
-                if not selfReferencing and item.id not in currentItem.children:
-                    # whether we have or havent stored this url before we must still add the child to currrent items child ids
-                    # with the exception of when a page is linking to itself, aka don't add child if self referencing
-                    # and also with the exception of if we already have the id listed as a child
-                    currentItem.children.append(item.id)
+                checkResult = self.urlChecks(link.get('href'), currentItem)
+                if checkResult == False:
+                    continue # returned false so url is invalid and we must skip it
+                if not isinstance(ScrapedItem.CollectorItem, checkResult):
+                    raise ValueError('urlChecks should have returned False from failing or returned a valid instance oc CollectorItem')
+                currentItem = checkResult # urlChecks didn't return false so it must be valid, instead urlChecks must have returned new currentItem
 
             currentItem = self.contentExtract(currentItem, currentItemContent) # sets currentItem's content, headerOne and title
 
