@@ -5,7 +5,7 @@ class DataStorage:
 
     def __init__(self, base):
         # absolute path to project, storage directory, base_url + _time
-        self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + str(round(time.time(),0)) )
+        self.storagePath = os.path.join(builtins.absolute, 'storage', Helper.removeNonAlphaNumeric(base) + '_' + str(int(time.time())) )
         self.storagePath = Helper.purgeWhitespace(self.storagePath)
         self.mkdir(self.storagePath)
 
