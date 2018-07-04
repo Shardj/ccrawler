@@ -46,7 +46,7 @@ class Data:
 
         # request params
         self.payload = {
-            'allow_redirects': False,
+            'allow_redirects': True,
             'timeout': 60,
             'headers': {
                 'User-Agent': agent
@@ -67,7 +67,7 @@ class Data:
     def fetchUrl(self, currentItem):
         t0 = time.time() # attempted request time
         response = requests.get(currentItem.url, params=self.payload)
-        if response.status_code == 302:
+        if response.history == 302:
             currentItem.url = response.headers['Location'] # redirect url
             urlChecks(currentItem.url, currentItem)
 
