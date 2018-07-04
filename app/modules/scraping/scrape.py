@@ -109,8 +109,13 @@ class Data:
                 raise ValueError('Invalid value of attempted in currentItem in Data start(), item at new id should never have already been attempted')
 
             # Attempt to fetch content from url
-            currentItemContent = self.fetchUrl(currentItem.url)
-            currentItem.attempted = True
+            try:
+                currentItemContent = self.fetchUrl(currentItem.url)
+                currentItem.attempted = True
+            except:
+                # if fetching raises an exception we still want to mark as attempted
+                currentItem.attempted = True
+                raise
             # Save changes
             self.collector[self.currentId] = currentItem
 
