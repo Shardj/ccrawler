@@ -139,7 +139,9 @@ class Data:
                     for item in self.collector:
                         if item.url == url and item.id != self.currentId:
                             selfReferencing = False
-                            self.collector[item.id].parents.append(self.currentId) # adds current id to parents on already existing item
+                            if self.currentId not in self.collector[item.id].parents: # if not already parent adds current id to parents on already existing item
+                                self.collector[item.id].parents.append(self.currentId)
+
                             break # break out of loop so item keeps its value to be used outside this if else
 
                 else:
@@ -147,9 +149,10 @@ class Data:
                     item = self.createCollectorItem(url) # creating collector item  handles parentId
                     self.addCollectorItem(item)
 
-                if not selfReferencing:
+                if not selfReferencing and item.id not in currentItem.children:
                     # whether we have or havent stored this url before we must still add the child to currrent items child ids
                     # with the exception of when a page is linking to itself, aka don't add child if self referencing
+                    # and also with the exception of if we already have the id listed as a child
                     currentItem.children.append(item.id)
 
             currentItem = self.contentExtract(currentItem, currentItemContent) # sets currentItem's content, headerOne and title
