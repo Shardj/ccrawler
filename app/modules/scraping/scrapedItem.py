@@ -16,7 +16,7 @@ class CollectorItem:
         self.content = [] # array normally with only one value, but selector could return multiple values
         self.attempted = False
         self.title = ''
-        self.headerOne = ''
+        self.headerOne = []
         self.saved = False
         self.parents = [parentId]
         self.children = []
@@ -26,13 +26,19 @@ class CollectorItem:
     # returns a stringified clone, doesn't effect original
     def stringifyTags(self):
         clone = copy.copy(self)
-        temp = ""
+        temp = ''
         for contentPart in clone.content:
             temp = temp + self.__cleanMe(contentPart)
 
         clone.content = temp
         clone.title = Helper.xstr(clone.title)
-        clone.headerOne = Helper.xstr(clone.headerOne)
+
+        temp = ''
+        for tag in clone.headerOne:
+            if tag is not None and tag != '':
+                temp = temp + ' - ' + tag.get_text().strip()
+
+        clone.headerOne = temp
         return clone
 
     # private tag to clean string for content

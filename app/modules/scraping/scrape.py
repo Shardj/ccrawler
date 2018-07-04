@@ -89,18 +89,14 @@ class Data:
 
     def contentExtract(self, currentItem, currentItemContent):
         currentItem.content = currentItemContent.find_all(self.selector)
+        
         currentItem.title = currentItemContent.title
         if currentItem.title != None:
             currentItem.title = currentItem.title.string
         else:
             currentItem.title = ''
 
-        currentItem.headerOne = currentItemContent.find('h1')
-        if currentItem.headerOne != None:
-            currentItem.headerOne = currentItem.headerOne.string
-        else:
-            currentItem.headerOne = ''
-
+        currentItem.headerOne = currentItemContent.find_all('h1')
         return currentItem
 
     def urlChecks(self, url, currentItem):
