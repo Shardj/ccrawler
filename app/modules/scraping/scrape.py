@@ -83,7 +83,7 @@ class Data:
         else:
             currentItem.title = ''
 
-        currentItem.headerOne = currentItemContent.h1
+        currentItem.headerOne = currentItemContent.find('h1')
         if currentItem.headerOne != None:
             currentItem.headerOne = currentItem.headerOne.string
         else:
