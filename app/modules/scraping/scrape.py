@@ -135,7 +135,7 @@ class Data:
         else:
             # we haven't already stored this url so we must create an item for it
             foundItem = self.createCollectorItem(url) # creating collector item  handles parentId
-            self.addCollectorItem(item)
+            self.addCollectorItem(foundItem)
 
         if foundItem is None:
             raise valueError('foundItem should never be without value here')
