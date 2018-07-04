@@ -112,12 +112,12 @@ class Data:
             try:
                 currentItemContent = self.fetchUrl(currentItem.url)
                 currentItem.attempted = True
+                self.collector[self.currentId] = currentItem # Save changes
             except:
                 # if fetching raises an exception we still want to mark as attempted
                 currentItem.attempted = True
+                self.collector[self.currentId] = currentItem # Save changes
                 raise
-            # Save changes
-            self.collector[self.currentId] = currentItem
 
             # Create new items from found links
             for link in currentItemContent.find_all('a'):
