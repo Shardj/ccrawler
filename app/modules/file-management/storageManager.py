@@ -13,7 +13,7 @@ class DataStorage:
         try:
             clonedItem = item.stringifyTags()
             # naming for this item. title__h1__unique
-            name = purgeWhitespace( str(clonedItem.id) + '__' + clonedItem.title + '__' + clonedItem.headerOne )
+            name = Helper.purgeWhitespace( str(clonedItem.id) + '__' + clonedItem.title + '__' + clonedItem.headerOne )
             metaPath = os.path.join(self.storagePath, name + '.meta')
             contentPath = os.path.join(self.storagePath, name + '.html')
             self.write(contentPath, clonedItem.content)
