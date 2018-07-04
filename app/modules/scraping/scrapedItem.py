@@ -28,9 +28,23 @@ class CollectorItem:
         clone = copy.copy(self)
         temp = ""
         for contentPart in clone.content:
-            temp = temp + str(contentPart)
+            temp = temp + self.__cleanMe(contentPart)
 
         clone.content = temp
         clone.title = Helper.xstr(clone.title)
         clone.headerOne = Helper.xstr(clone.headerOne)
         return clone
+
+    # private tag to clean string for content
+    def __cleanMe(self, soup):
+        for script in soup(["script", "style"]): # remove all javascript and stylesheet code
+            script.extract()
+        # get text
+        text = soup.get_text()
+        # break into lines and remove leading and trailing white space on each
+        lines = (line.strip() for line in text.splitlines())
+        # break multi-headlines into a line each
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        # drop blank lines
+        text = '\n'.join(chunk for chunk in chunks if chunk)
+        return text
