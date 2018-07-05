@@ -89,7 +89,7 @@ class Data:
 
     def contentExtract(self, currentItem, currentItemContent):
         currentItem.content = currentItemContent.find_all(self.selector)
-        
+
         currentItem.title = currentItemContent.title
         if currentItem.title != None:
             currentItem.title = currentItem.title.string
@@ -107,6 +107,7 @@ class Data:
                 return False
 
         url = urldefrag(url).url # remove fragmentation from url before checks
+        url = url.rsplit('?', 1)[0] # removes any GET vars (query string) from url
 
         # Check url is an extension of our base url
         if self.base not in url:
