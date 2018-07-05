@@ -18,4 +18,5 @@ python3 -m unittest tests/test_{name}.py
 
 New \_\_builtins\_\_ function added in launcher.py to allow for easy module imports from anywhere in the project to anywhere else. However its usage isn't ideal, a viable alternative would be helpful
 
-TODO follow redirects, TODO handle items in database instead of in object
+TODO handle items in database instead of in object
+TODO wrapper, indexing, navigation

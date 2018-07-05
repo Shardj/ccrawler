@@ -1,5 +1,5 @@
 # Imports
-import random, time, requests
+import random, time, requests, re
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urldefrag
@@ -109,8 +109,8 @@ class Data:
         url = urldefrag(url).url # remove fragmentation from url before checks
         url = url.rsplit('?', 1)[0] # removes any GET vars (query string) from url
 
-        # Check url is an extension of our base url
-        if self.base not in url:
+        # Check url is a match to our 'base'
+        if not re.search(self.base, url):
             return False
 
         # if self referencing link then just pass back without issue and without changes
