@@ -14,7 +14,7 @@ class DataStorage:
             # naming for this item. title__h1__unique
             name = str(clonedItem.id) + '__' + Helper.removeNonAlphaNumeric(clonedItem.title) + '__' + Helper.removeNonAlphaNumeric(clonedItem.headerOne)
             metaPath = Helper.purgeWhitespace(os.path.join(self.storagePath, name + '.meta'))
-            contentPath = Helper.purgeWhitespace(os.path.join(self.storagePath, name + '.html'))
+            contentPath = Helper.purgeWhitespace(os.path.join(self.storagePath, name + '.txt'))
             self.write(contentPath, clonedItem.content)
             del clonedItem.content # we don't want content in our meta files
             self.write(metaPath, json.dumps(clonedItem.__dict__))
